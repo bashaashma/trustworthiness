@@ -239,27 +239,19 @@ async function callClaudeAPI(userMessage, conversationHistory) {
     { role: "user", content: userMessage },
   ];
 
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
+  const response = await fetch("/.netlify/functions/claude", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 1000,
-      system: UNDERWRITER_SYSTEM_PROMPT,
-      messages,
-    }),
+    body: JSON.stringify({ messages }),
   });
 
+  const data = await response.json().catch(() => ({}));
+
   if (!response.ok) {
-    const errData = await response.json().catch(() => ({}));
-    throw new Error(errData.error?.message || `API error: ${response.status}`);
+    throw new Error(data.error || `API error: ${response.status}`);
   }
 
-  const data = await response.json();
-  return data.content
-    .filter((block) => block.type === "text")
-    .map((block) => block.text)
-    .join("\n");
+  return data.text || "";
 }
 
 // ── Icons ───────────────────────────────────────────────────────────
