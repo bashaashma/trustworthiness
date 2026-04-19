@@ -208,12 +208,22 @@ function checkPrivacyConcerns(text) {
   return { hasConcerns: concerns.length > 0, concerns };
 }
 
+function makeTraceHash(value) {
+  const text = String(value || "");
+  let hash = 2166136261;
+  for (let i = 0; i < text.length; i++) {
+    hash ^= text.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  return (hash >>> 0).toString(36).padStart(7, "0");
+}
+
 function generateAccountabilityTrace(input, output, flags) {
   return {
     id: `TRACE-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`,
     timestamp: new Date().toISOString(),
-    inputHash: btoa(input.slice(0, 60)).substr(0, 20),
-    outputHash: btoa(output.slice(0, 60)).substr(0, 20),
+    inputHash: makeTraceHash(input.slice(0, 60)),
+    outputHash: makeTraceHash(output.slice(0, 60)),
     biasFlags: flags.length,
     guidelinesChecked: INSURANCE_GUIDELINES.length,
     decision: flags.length === 0 ? "PASS" : "FLAGGED",
