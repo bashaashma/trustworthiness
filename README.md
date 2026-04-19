@@ -41,3 +41,7 @@ This package converts your uploaded React prototype into a Netlify-deployable Vi
 ## Important note
 
 Your original code called Anthropic directly from the browser. That would expose the API key publicly. The Netlify Function keeps the key on the server side instead.
+
+
+## Important Netlify build note
+If Netlify fails during `npm install` and the log mentions an internal or unexpected registry URL, delete `package-lock.json` and redeploy. This package already omits the lockfile and includes `.npmrc` pointing to the public npm registry.
